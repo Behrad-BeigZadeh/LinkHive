@@ -8,6 +8,7 @@ import {
   updateLinkSchema,
 } from "../schemas/linkSchema";
 import cloudinary from "../utils/cloudinary";
+import { Link } from "../generated/prisma";
 
 export const getUserLinks = async (
   req: AuthenticatedRequest,
@@ -264,7 +265,7 @@ export const deleteLink = async (
       orderBy: { order: "asc" },
     });
 
-    const updatePromises = remainingLinks.map((link, index) =>
+    const updatePromises = remainingLinks.map((link: Link, index) =>
       prisma.link.update({
         where: { id: link.id },
         data: { order: index + 1 },
