@@ -8,6 +8,11 @@ export function middleware(req: NextRequest) {
   const isPublicPage = pathname.startsWith("/public-page");
   const isHomePage = pathname === "/";
 
+  console.log("📍 Middleware triggered");
+  console.log("🧪 Path:", pathname);
+
+  console.log("🔁 Refresh Token:", refreshToken ? "YES" : "NO");
+
   // Let public and home and auth pages go through
   if (isPublicPage || isHomePage || isAuthPage) {
     if (refreshToken && isAuthPage) {
