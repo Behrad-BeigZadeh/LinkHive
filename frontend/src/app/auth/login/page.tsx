@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import NeonButton from "@/components/NeonButton";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { handleLogin } from "@/apis/authApi";
 import toast from "react-hot-toast";
@@ -23,7 +22,6 @@ export default function LoginPage() {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
 
   const loginMutation = useMutation({
     mutationFn: (formData: LoginFormData) => handleLogin(formData),
@@ -33,7 +31,7 @@ export default function LoginPage() {
 
       setUser(user);
       setAccessToken(accessToken);
-      router.push("/");
+      window.location.href = "/dashboard";
     },
     onError: (error: AxiosError<{ error: ZodErrorItem[] | string }>) => {
       const errData = error.response?.data?.error;
