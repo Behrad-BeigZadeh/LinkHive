@@ -8,7 +8,6 @@ import toast from "react-hot-toast";
 import { handleSignup } from "@/apis/authApi";
 import { useAuthStore } from "@/stores/userStore";
 import { AxiosError } from "axios";
-import { useRouter } from "next/navigation";
 import NeonButton from "@/components/NeonButton";
 
 export type SignupFormData = {
@@ -29,7 +28,6 @@ export default function SignupPage() {
     confirmPassword: "",
   });
   const { setUser, setAccessToken } = useAuthStore();
-  const router = useRouter();
 
   const signupMutation = useMutation({
     mutationFn: (formData: SignupFormData) => handleSignup(formData),
@@ -38,7 +36,7 @@ export default function SignupPage() {
       toast.success("Signup successful!");
       setUser(user);
       setAccessToken(accessToken);
-      router.push("/");
+      window.location.href = "/dashboard";
     },
 
     onError: (error: AxiosError<{ error: ZodErrorItem[] | string }>) => {
