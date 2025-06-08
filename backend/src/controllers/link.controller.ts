@@ -265,7 +265,7 @@ export const deleteLink = async (
       orderBy: { order: "asc" },
     });
 
-    const updatePromises = remainingLinks.map((link: Link, index) =>
+    const updatePromises = remainingLinks.map((link: Link, index: number) =>
       prisma.link.update({
         where: { id: link.id },
         data: { order: index + 1 },
