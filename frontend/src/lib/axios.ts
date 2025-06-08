@@ -49,7 +49,7 @@ api.interceptors.request.use(async (config) => {
     }
 
     return config;
-  } catch (err) {
+  } catch {
     return config;
   }
 });
