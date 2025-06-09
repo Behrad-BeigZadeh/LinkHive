@@ -54,9 +54,17 @@
     npm run dev
 
 ### Frontend
- ```bash
-cd frontend
-npm install
-npm run dev
+    ```bash
+    cd frontend
+    npm install
+    npm run dev
 
+Make sure to add your .env files for both frontend and backend, including:
 
+Database URL
+
+JWT secrets
+
+Redis credentials
+
+Cloudinary API keys
