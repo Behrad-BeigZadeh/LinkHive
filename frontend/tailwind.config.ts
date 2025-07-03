@@ -1,5 +1,6 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+import scrollbar from "tailwind-scrollbar";
+
+const tailwindConfig = {
   darkMode: "class",
   content: [
     "./src/app/**/*.{js,ts,jsx,tsx}",
@@ -18,5 +19,7 @@ module.exports = {
       pattern: /hover:shadow-(emerald|fuchsia|cyan)-400\/50/,
     },
   ],
-  plugins: [],
+  plugins: [scrollbar],
 };
+
+export default tailwindConfig;

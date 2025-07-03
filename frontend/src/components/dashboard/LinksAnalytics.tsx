@@ -48,7 +48,7 @@ export default function LinksAnalytics() {
             </div>
 
             {/* Click History List */}
-            <div className="bg-slate-800/50 rounded-xl p-6 shadow-md max-h-64 ">
+            <div className="bg-slate-800/50 rounded-xl p-6 shadow-md max-h-64 overflow-y-auto  ">
               <p className="text-sm text-slate-300 mb-3 font-medium">
                 Click History
               </p>

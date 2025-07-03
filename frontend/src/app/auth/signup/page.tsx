@@ -6,9 +6,10 @@ import Link from "next/link";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { handleSignup } from "@/apis/authApi";
-import { useAuthStore } from "@/stores/userStore";
 import { AxiosError } from "axios";
 import NeonButton from "@/components/NeonButton";
+import { useAuthTokenStore } from "@/stores/tokenStore";
+import { useUserStore } from "@/stores/userStore";
 
 export type SignupFormData = {
   username: string;
@@ -27,7 +28,8 @@ export default function SignupPage() {
     password: "",
     confirmPassword: "",
   });
-  const { setUser, setAccessToken } = useAuthStore();
+  const { setUser } = useUserStore();
+  const { setAccessToken } = useAuthTokenStore();
 
   const signupMutation = useMutation({
     mutationFn: (formData: SignupFormData) => handleSignup(formData),
@@ -158,6 +160,7 @@ export default function SignupPage() {
             type="submit"
             color="fuchsia"
             text={signupMutation.isPending ? "Signing up..." : "Sign Up"}
+            pulse
           />
           <p className="text-sm text-center text-zinc-400 mt-4">
             Already have an account?{" "}

@@ -55,7 +55,7 @@ export const Signup = async (req: Request, res: Response): Promise<any> => {
       .status(201)
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        sameSite: "none",
+        sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
@@ -77,6 +77,7 @@ export const Signup = async (req: Request, res: Response): Promise<any> => {
 
 export const Login = async (req: Request, res: Response): Promise<any> => {
   try {
+    console.log("first");
     const parsed = loginSchema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({ error: parsed.error.errors });
@@ -94,16 +95,19 @@ export const Login = async (req: Request, res: Response): Promise<any> => {
     if (!isPasswordValid) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
+    console.log("second");
 
     const accessToken = generateAccessToken(user.id);
     const refreshToken = generateRefreshToken(user.id);
     await storeRefreshToken(user.id, refreshToken);
 
+    console.log("third");
+
     return res
       .status(200)
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        sameSite: "none",
+        sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
@@ -119,6 +123,8 @@ export const Login = async (req: Request, res: Response): Promise<any> => {
         },
       });
   } catch (error) {
+    console.error("Login error:", error);
+
     return res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -145,7 +151,7 @@ export const Logout = async (
     return res
       .clearCookie("refreshToken", {
         httpOnly: true,
-        sameSite: "none",
+        sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
       })
       .status(200)
@@ -197,7 +203,7 @@ export const RefreshToken = async (
 
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
-      sameSite: "none",
+      sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });

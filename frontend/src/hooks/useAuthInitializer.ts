@@ -1,10 +1,12 @@
 import { useEffect } from "react";
 import axios from "axios";
 import { handleLogout } from "../apis/authApi";
-import { useAuthStore } from "../stores/userStore";
+import { useUserStore } from "@/stores/userStore";
+import { useAuthTokenStore } from "@/stores/tokenStore";
 
 export const useAuthInitializer = () => {
-  const { setAccessToken, setUser, logout } = useAuthStore();
+  const { setUser, logoutUser, setHasHydrated } = useUserStore();
+  const { setAccessToken, logoutToken } = useAuthTokenStore();
 
   useEffect(() => {
     const tryRefresh = async () => {
@@ -18,12 +20,13 @@ export const useAuthInitializer = () => {
         setAccessToken(data.data.accessToken);
         setUser(data.data.user);
       } catch (err) {
-        if (axios.isAxiosError(err)) {
-          if (err.response?.status === 401) {
-            await handleLogout();
-            logout();
-          }
+        if (axios.isAxiosError(err) && err.response?.status === 401) {
+          await handleLogout();
+          logoutUser();
+          logoutToken();
         }
+      } finally {
+        setHasHydrated(true);
       }
     };
 

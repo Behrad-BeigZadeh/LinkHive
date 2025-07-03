@@ -4,7 +4,6 @@ import NeonButton from "../NeonButton";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getUserLinks, deleteLink, reorderLinks } from "@/apis/linksApi";
 import { useEffect, useState } from "react";
-import { useAuthStore } from "@/stores/userStore";
 import toast from "react-hot-toast";
 import { useLinkSTore } from "@/stores/linkStore";
 import SortableLinkItem from "@/components/dashboard/SortableLinkItem";
@@ -22,15 +21,17 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { GripVertical } from "lucide-react";
+import { useUserStore } from "@/stores/userStore";
+import { useAuthTokenStore } from "@/stores/tokenStore";
 
 export default function LinkList() {
   const [selectedLinkId, setSelectedLinkId] = useState<string | null>(null);
   const [activeLinkId, setActiveLinkId] = useState<string | null>(null);
-  const { user, accessToken } = useAuthStore();
+  const { user } = useUserStore();
+  const { accessToken } = useAuthTokenStore();
   const { setLinksLength, setAllLinks, allLinks } = useLinkSTore();
   const sensors = useSensors(useSensor(PointerSensor));
   const queryClient = useQueryClient();
-
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["my-links", user?.id],
     queryFn: getUserLinks,

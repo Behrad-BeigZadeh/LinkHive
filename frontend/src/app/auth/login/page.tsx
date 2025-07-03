@@ -6,9 +6,10 @@ import Link from "next/link";
 import { useMutation } from "@tanstack/react-query";
 import { handleLogin } from "@/apis/authApi";
 import toast from "react-hot-toast";
-import { useAuthStore } from "@/stores/userStore";
+import { useUserStore } from "@/stores/userStore";
 import { AxiosError } from "axios";
 import { ZodErrorItem } from "../signup/page";
+import { useAuthTokenStore } from "@/stores/tokenStore";
 
 export type LoginFormData = {
   email: string;
@@ -16,7 +17,8 @@ export type LoginFormData = {
 };
 
 export default function LoginPage() {
-  const { setUser, setAccessToken } = useAuthStore();
+  const { setUser } = useUserStore();
+  const { setAccessToken } = useAuthTokenStore();
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
@@ -110,6 +112,7 @@ export default function LoginPage() {
             text={loginMutation.isPending ? "Logging In..." : "Log In"}
             color="emerald"
             full
+            pulse
           />
         </form>
 

@@ -10,29 +10,25 @@ interface User {
 
 interface UserStore {
   user: User | null;
-  accessToken: string | null;
   hasHydrated: boolean;
-  setAccessToken: (accessToken: string) => void;
   setUser: (user: User) => void;
-  logout: () => void;
+  logoutUser: () => void;
   setHasHydrated: (hasHydrated: boolean) => void;
 }
 
-export const useAuthStore = create<UserStore>()(
+export const useUserStore = create<UserStore>()(
   persist(
     (set) => ({
       user: null,
-      accessToken: null,
       hasHydrated: false,
-      setAccessToken: (accessToken) => set({ accessToken }),
       setUser: (user) => set({ user }),
-      logout: () => set({ user: null, accessToken: null }),
+      logoutUser: () => set({ user: null }),
       setHasHydrated: (hasHydrated) => set({ hasHydrated }),
     }),
     {
-      name: "linkHive-auth",
+      name: "linkHive-user",
       onRehydrateStorage: () => () => {
-        useAuthStore.getState().setHasHydrated(true);
+        useUserStore.getState().setHasHydrated(true);
       },
     }
   )

@@ -1,18 +1,19 @@
 "use client";
-
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import NeonButton from "./NeonButton";
 import Link from "next/link";
-import { useAuthStore } from "@/stores/userStore";
+import { useUserStore } from "@/stores/userStore";
 import { useMutation } from "@tanstack/react-query";
 import { handleLogout } from "@/apis/authApi";
 import toast from "react-hot-toast";
 import { usePathname, useRouter } from "next/navigation";
+import { useAuthTokenStore } from "@/stores/tokenStore";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { accessToken, user, logout } = useAuthStore();
+  const { user, logoutUser, hasHydrated } = useUserStore();
+  const { accessToken, logoutToken } = useAuthTokenStore();
   const pathname = usePathname();
   const isPublicPage = pathname?.startsWith("/public-page");
   const router = useRouter();
@@ -21,7 +22,8 @@ export default function Header() {
     mutationFn: () => handleLogout(),
     onSuccess: () => {
       toast.success("Logged out successfully.");
-      logout();
+      logoutUser();
+      logoutToken();
       router.replace("/");
       setMenuOpen(false);
     },
@@ -34,6 +36,13 @@ export default function Header() {
   const handleLogoutClick = () => {
     logoutMutation.mutate();
   };
+
+  if (!hasHydrated)
+    return (
+      <div className="flex justify-center py-10">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-t-cyan-400 border-white/10" />
+      </div>
+    );
   return (
     <header className="fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-black/10 border-b border-white/10">
       <div className="max-w-6xl mx-auto px-4 sm:px-8 py-3 flex items-center justify-between">
