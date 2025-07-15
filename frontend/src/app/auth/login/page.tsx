@@ -30,7 +30,6 @@ export default function LoginPage() {
     onSuccess: (data) => {
       const { accessToken, user } = data.data;
       toast.success("Login successful!");
-
       setUser(user);
       setAccessToken(accessToken);
       window.location.href = "/dashboard";
