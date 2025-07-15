@@ -6,12 +6,12 @@ import NeonButton from "@/components/NeonButton";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { editProfile } from "@/apis/authApi";
-import { useAuthStore } from "@/stores/userStore";
 import { AxiosError } from "axios";
+import { useUserStore } from "@/stores/userStore";
 
 export default function CreateLinkPage() {
   const router = useRouter();
-  const { setUser } = useAuthStore();
+  const { setUser } = useUserStore();
 
   const [formData, setFormData] = useState({
     username: "",
