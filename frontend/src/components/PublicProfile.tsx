@@ -60,7 +60,7 @@ export default function PublicProfile({ username }: { username: string }) {
   };
 
   return (
-    <div className="w-full -mt-32 max-w-md mx-auto rounded-xl p-6  bg-zinc-900/60 backdrop-blur-md border border-emerald-500 text-white  ">
+    <div className="w-full  max-w-md mx-auto rounded-xl p-6  bg-zinc-900/60 backdrop-blur-md border border-emerald-500 text-white  ">
       <div className="flex flex-col items-center text-center">
         {avatarUrl ? (
           <img

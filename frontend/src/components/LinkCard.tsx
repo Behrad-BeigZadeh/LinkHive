@@ -13,7 +13,7 @@ export default function LinkCard({ link }: { link: Link }) {
       href={link.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block w-full text-center px-6 py-3 rounded-lg border border-emerald-300 text-emerald-400 hover:bg-emerald-500 hover:text-black transition-all"
+      className="block w-full text-center px-6 py-2 rounded-lg border border-emerald-300 text-emerald-400 hover:bg-emerald-500 hover:text-black transition-all"
     >
       {link.title}
     </Link>
