@@ -1,15 +1,14 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { prisma } from "../lib/prisma";
-import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken,
+} from "../utils/jwt";
 import { loginSchema, registerSchema } from "../schemas/authSchema";
 import { AuthenticatedRequest } from "../middleware/middleware";
-import {
-  deleteRefreshToken,
-  storeRefreshToken,
-  validateRefreshToken,
-} from "../services/token.service";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import { compareHashedToken, hashToken } from "../utils/hash";
 
 export const Signup = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -50,7 +49,13 @@ export const Signup = async (req: Request, res: Response): Promise<any> => {
 
     const accessToken = generateAccessToken(user.id);
     const refreshToken = generateRefreshToken(user.id);
-    await storeRefreshToken(user.id, refreshToken);
+    const hashedRefreshToken = await hashToken(refreshToken);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken: hashedRefreshToken },
+    });
+
     return res
       .status(201)
       .cookie("refreshToken", refreshToken, {
@@ -77,7 +82,6 @@ export const Signup = async (req: Request, res: Response): Promise<any> => {
 
 export const Login = async (req: Request, res: Response): Promise<any> => {
   try {
-    console.log("first");
     const parsed = loginSchema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({ error: parsed.error.errors });
@@ -95,13 +99,15 @@ export const Login = async (req: Request, res: Response): Promise<any> => {
     if (!isPasswordValid) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
-    console.log("second");
 
     const accessToken = generateAccessToken(user.id);
     const refreshToken = generateRefreshToken(user.id);
-    await storeRefreshToken(user.id, refreshToken);
+    const hashedRefreshToken = await hashToken(refreshToken);
 
-    console.log("third");
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken: hashedRefreshToken },
+    });
 
     return res
       .status(200)
@@ -138,15 +144,32 @@ export const Logout = async (
     if (!refreshToken) {
       return res.status(204).send();
     }
-    const decoded = jwt.verify(
-      refreshToken,
-      process.env.REFRESH_TOKEN_SECRET!
-    ) as JwtPayload;
-    const userId = decoded.userId;
-    if (!userId) {
-      return res.status(401).json({ error: "Unauthorized" });
+    const users = await prisma.user.findMany({
+      where: {
+        refreshToken: {
+          not: null,
+        },
+      },
+    });
+
+    let matchedUser;
+
+    for (const user of users) {
+      const isMatch = await bcrypt.compare(refreshToken, user.refreshToken!);
+      if (isMatch) {
+        matchedUser = user;
+        break;
+      }
     }
-    await deleteRefreshToken(userId);
+
+    if (!matchedUser) {
+      return res.status(204).send();
+    }
+
+    await prisma.user.update({
+      where: { id: matchedUser.id },
+      data: { refreshToken: null },
+    });
 
     return res
       .clearCookie("refreshToken", {
@@ -162,7 +185,7 @@ export const Logout = async (
 };
 
 export const RefreshToken = async (
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response
 ): Promise<any> => {
   try {
@@ -170,36 +193,34 @@ export const RefreshToken = async (
     if (!refreshToken) {
       return res.status(401).json({ error: "Refresh token not found" });
     }
-
-    const decoded = jwt.verify(
-      refreshToken,
-      process.env.REFRESH_TOKEN_SECRET!
-    ) as JwtPayload;
-
-    const userId = decoded.userId;
-    if (!userId) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
-    const isValid = await validateRefreshToken(userId, refreshToken);
-    if (!isValid) {
+    let decoded;
+    try {
+      decoded = verifyRefreshToken(refreshToken);
+    } catch (err) {
       return res.status(401).json({ error: "Invalid refresh token" });
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        avatarUrl: true,
-      },
+      where: { id: decoded.userId },
     });
 
-    const newAccessToken = generateAccessToken(userId);
-    const newRefreshToken = generateRefreshToken(userId);
+    if (!user || !user.refreshToken) {
+      return res.status(401).json({ error: "Invalid refresh token" });
+    }
 
-    await storeRefreshToken(userId, newRefreshToken);
+    const isValid = await compareHashedToken(refreshToken, user.refreshToken);
+    if (!isValid) {
+      return res.status(401).json({ error: "Invalid refresh token" });
+    }
+
+    const accessToken = generateAccessToken(user.id);
+    const newRefreshToken = generateRefreshToken(user.id);
+    const newHashedToken = await hashToken(newRefreshToken);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken: newHashedToken },
+    });
 
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
@@ -211,7 +232,7 @@ export const RefreshToken = async (
     return res.status(200).json({
       data: {
         user,
-        accessToken: newAccessToken,
+        accessToken,
       },
     });
   } catch (error) {
