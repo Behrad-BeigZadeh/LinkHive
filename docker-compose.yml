@@ -1,0 +1,20 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - redis
+    command: sh -c "npx prisma generate --schema=src/prisma/schema.prisma && npm run dev"
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+

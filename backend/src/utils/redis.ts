@@ -1,20 +1,19 @@
 import Redis from "ioredis";
+import dotenv from "dotenv";
+import logger from "../lib/logger";
 
-const redis = new Redis({
-  host: "redis-15044.c311.eu-central-1-1.ec2.redns.redis-cloud.com",
-  port: 15044,
-  username: "default",
-  password: "91CzzjFlZbzsi5DUjXnTmArwmP5p0N0A",
-});
+dotenv.config();
+
+const redis = new Redis(process.env.REDIS_URL!);
 
 redis.on("error", (err) => {
-  console.error("Redis error", err);
+  logger.error("Redis error", err);
 });
 
 redis
   .set("foo", "bar")
   .then(() => redis.get("foo"))
-  .then((val) => console.log("Value from Redis:", val))
-  .catch(console.error);
+  .then((val) => logger.info("Value from Redis:", val))
+  .catch(logger.error);
 
 export default redis;
