@@ -4,13 +4,13 @@
 
 ## 🚀 Live Demo
 
-👉 [Live App](https://link-hive-plum.vercel.app) 
+👉 [Live App](https://link-hive-plum.vercel.app)
 
 ---
 
 ## ✨ Features
 
-- ✅ User registration & login with secure access tokens (JWT + Refresh Token via Redis)
+- ✅ User registration & login with secure access tokens (JWT + Refresh Token )
 - ✅ Fully responsive and animated interface (mobile-first)
 - ✅ Create, edit, delete, and reorder links (drag & drop support)
 - ✅ Public profile with customizable bio, avatar, and username
@@ -24,6 +24,7 @@
 ## 🧰 Tech Stack
 
 ### Frontend
+
 - Next.js
 - TypeScript
 - Tailwind CSS
@@ -34,10 +35,10 @@
 - DnD Kit
 
 ### Backend
+
 - Node.js + Express
 - TypeScript
 - Prisma ORM with PostgreSQL
-- Redis
 - Cloudinary
 - Zod
 - Winston
@@ -47,6 +48,7 @@
 ## 🛠️ Setup Instructions
 
 ### Backend
+
     ```bash
     cd backend
     npm install
@@ -54,6 +56,7 @@
     npm run dev
 
 ### Frontend
+
     ```bash
     cd frontend
     npm install
@@ -64,7 +67,5 @@ Make sure to add your .env files for both frontend and backend, including:
 Database URL
 
 JWT secrets
-
-Redis credentials
 
 Cloudinary API keys
